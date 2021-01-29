@@ -215,6 +215,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instantPhotoPrefab: {fileID: 7347214189005762058, guid: 42dc88940b77b40459ee13dfb3e59f14, type: 3}
   badPhotoPrefab: {fileID: 7347214189005762058, guid: 360b32314b55fba45a666f4a521a87d9, type: 3}
+  origPhotoPrefab: {fileID: 7347214189005762058, guid: 20f7afee915bc8c4d946774e5c23b039, type: 3}
+  photoGhosts: []
 --- !u!95 &8252987543203551581
 Animator:
   serializedVersion: 3
@@ -340,6 +342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7895212511079294724}
   - component: {fileID: 4454093697922587448}
+  - component: {fileID: 1065888760351332241}
   m_Layer: 8
   m_Name: Camera
   m_TagString: Untagged
@@ -404,6 +407,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!124 &1065888760351332241
+Behaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3095476657293893852}
+  m_Enabled: 1
 --- !u!1 &3204779145945747526
 GameObject:
   m_ObjectHideFlags: 0

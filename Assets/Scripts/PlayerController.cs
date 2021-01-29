@@ -19,7 +19,9 @@ public class PlayerController : MonoBehaviour {
     bool lastFootLeft = false;
     int lastLeftFootSFX = 0;
     int lastRightFootSFX = 0;
+    float footSFXVolume = 0;
 
+    bool prevGrounded = false;
     bool grounded = false;
     float tilt = 0f;
     float verticalVelocity = 0f;
@@ -28,6 +30,10 @@ public class PlayerController : MonoBehaviour {
     Rigidbody rb;
     Animator handAnim;
     IActionable handActionable;
+
+    public Transform GetHand() {
+        return handTransform;
+    }
 
     void Start() {
         tiltTransform = transform.GetChild(0);
@@ -75,6 +81,8 @@ public class PlayerController : MonoBehaviour {
         RaycastHit hit;
         Vector3 start = transform.position + Vector3.up * 0.1f;
         Vector3 dir = Vector3.down;
+
+        prevGrounded = grounded;
         if (verticalVelocity <= 0 && Physics.Raycast(start, dir, out hit, 0.2f, ~LayerMask.GetMask("Player"))) {
             grounded = true;
             rb.MovePosition(hit.point);
@@ -97,21 +105,29 @@ public class PlayerController : MonoBehaviour {
 
         rb.velocity = (Vector3.up * verticalVelocity) + (speed * step);
 
-        footSFXTimer += Time.deltaTime * step.magnitude;
+        if (grounded)
+            footSFXTimer += Time.deltaTime * step.magnitude;
+
+        footSFXVolume = step.magnitude;
+        if (prevGrounded != grounded) {
+            footSFXTimer = footSFXMinPeriod + 0.1f;
+            footSFXVolume = 1f;
+        }
+
+
         if (footSFXTimer > footSFXMinPeriod) {
-            int clip = 0;
-            clip = Random.Range(0, footSFX.Length - 1);
+            int clip = Random.Range(0, footSFX.Length - 1);
             if (lastFootLeft) {
                 if (lastRightFootSFX == clip)
                     clip = Random.Range(0, footSFX.Length - 1);
                 rightFootSFX.clip = footSFX[clip];
-                rightFootSFX.volume = step.magnitude * 0.25f;
+                rightFootSFX.volume = footSFXVolume * 0.25f;
                 rightFootSFX.Play();
             } else {
                 if (lastLeftFootSFX == clip)
                     clip = Random.Range(0, footSFX.Length - 1);
                 leftFootSFX.clip = footSFX[clip];
-                leftFootSFX.volume = step.magnitude * 0.25f;
+                leftFootSFX.volume = footSFXVolume * 0.25f;
                 leftFootSFX.Play();
             }
             lastFootLeft = !lastFootLeft;

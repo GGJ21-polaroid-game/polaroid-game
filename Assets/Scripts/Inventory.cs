@@ -39,25 +39,42 @@ public class Inventory : MonoBehaviour, IActionable {
     }
 
     void Update() {
-        if (!isPrimaryActioning && !isSecondaryActioning && !isSwitching) {
-            int pai = activeIndex;
+        if (transform.childCount > 0) {
+            if (!isPrimaryActioning && !isSecondaryActioning && !isSwitching) {
+                int pai = activeIndex;
 
-            scroll += Input.GetAxis("Mouse ScrollWheel") * scrollSensitivity;
+                scroll += Input.GetAxis("Mouse ScrollWheel") * scrollSensitivity;
 
-            int step = (int)Mathf.Floor(scroll);
-            scroll = scroll - step;
+                int step = (int)Mathf.Floor(scroll);
+                scroll = scroll - step;
 
-            activeIndex = (int)Mathf.Repeat(activeIndex + step, transform.childCount);
+                activeIndex = (int)Mathf.Repeat(activeIndex + step, transform.childCount);
 
-            if (pai != activeIndex) {
-                prevActive = active;
-                active = transform.GetChild(activeIndex);
-                activeActionable = active.GetComponent<IActionable>();
-                handAnim.SetTrigger("switch");
+                if (pai != activeIndex) {
+                    prevActive = active;
+                    active = transform.GetChild(activeIndex);
+                    activeActionable = active.GetComponent<IActionable>();
+                    handAnim.SetTrigger("switch");
 
-                isSwitching = true;
+                    isSwitching = true;
+                }
             }
         }
+    }
+
+    public void AddItem(Transform item) {
+        if (active != null) {
+            active.localScale = Vector3.zero;
+        }
+
+        active = item;
+        activeActionable = active.GetComponent<IActionable>();
+        activeIndex = transform.childCount;
+
+        item.parent = transform;
+        item.localPosition = Vector3.zero;
+        item.localRotation = Quaternion.identity;
+        item.localScale = Vector3.one;
     }
 
     public Transform GetPlayer() {
