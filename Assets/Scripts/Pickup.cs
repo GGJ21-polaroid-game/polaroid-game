@@ -19,10 +19,21 @@ public class Pickup : MonoBehaviour {
             
             while (transform.childCount > 0) {
                 Transform child = transform.GetChild(0);
+
+                SetLayerToPlayer(child);
+
                 inventory.AddItem(child);
             }
 
             Destroy(gameObject);
+        }
+    }
+
+    void SetLayerToPlayer(Transform t) {
+        t.gameObject.layer = LayerMask.NameToLayer("Player");
+        for (int i = 0; i < t.childCount; ++i) {
+            Transform child = t.GetChild(i);
+            SetLayerToPlayer(child);
         }
     }
 }

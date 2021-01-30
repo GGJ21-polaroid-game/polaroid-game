@@ -176,9 +176,10 @@ GameObject:
   - component: {fileID: 3748560954101870391}
   - component: {fileID: 8252987543203551581}
   - component: {fileID: 1267484649701708264}
+  - component: {fileID: 8413091437422887988}
   m_Layer: 8
   m_Name: InstantCamera
-  m_TagString: Untagged
+  m_TagString: InstantCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -216,6 +217,7 @@ MonoBehaviour:
   instantPhotoPrefab: {fileID: 7347214189005762058, guid: 42dc88940b77b40459ee13dfb3e59f14, type: 3}
   badPhotoPrefab: {fileID: 7347214189005762058, guid: 360b32314b55fba45a666f4a521a87d9, type: 3}
   origPhotoPrefab: {fileID: 7347214189005762058, guid: 20f7afee915bc8c4d946774e5c23b039, type: 3}
+  inventory: {fileID: 0}
   photoGhosts: []
 --- !u!95 &8252987543203551581
 Animator:
@@ -332,6 +334,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!135 &8413091437422887988
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2420447773620017204}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3095476657293893852
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,7 +410,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 567
+    m_Bits: 2615
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 934b4b4bdb7dbf141ae927e5c0b06c8f, type: 2}
   m_TargetDisplay: 0

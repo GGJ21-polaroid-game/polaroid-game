@@ -63,18 +63,29 @@ public class Inventory : MonoBehaviour, IActionable {
     }
 
     public void AddItem(Transform item) {
-        if (active != null) {
-            active.localScale = Vector3.zero;
-        }
-
-        active = item;
-        activeActionable = active.GetComponent<IActionable>();
-        activeIndex = transform.childCount;
 
         item.parent = transform;
         item.localPosition = Vector3.zero;
         item.localRotation = Quaternion.identity;
-        item.localScale = Vector3.one;
+        item.localScale = Vector3.zero;
+
+        prevActive = active;
+        active = item;
+        activeIndex = transform.childCount-1;
+        activeActionable = active.GetComponent<IActionable>();
+        handAnim.SetTrigger("switch");
+
+        isSwitching = true;
+    }
+
+    public void RemoveItem(Transform item) {
+        for (int i = 0; i < transform.childCount; ++i) {
+            Transform child = transform.GetChild(i);
+            if (child == item) {
+                child.parent = null;
+                Destroy(child.gameObject);
+            }
+        }
     }
 
     public Transform GetPlayer() {

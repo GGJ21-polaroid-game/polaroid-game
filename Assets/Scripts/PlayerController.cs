@@ -10,10 +10,15 @@ public class PlayerController : MonoBehaviour {
     public float terminalSpeed = 100f;
     public float jumpSpeed = 50f;
 
+    public float standHeight = 2f;
+    public float crouchHeight = 1f;
+
     public float footSFXMinPeriod = 1f;
     public AudioSource leftFootSFX;
     public AudioSource rightFootSFX;
     public AudioClip[] footSFX;
+
+    public SnowPlanter snowPlanter;
 
     float footSFXTimer = 0;
     bool lastFootLeft = false;
@@ -23,13 +28,19 @@ public class PlayerController : MonoBehaviour {
 
     bool prevGrounded = false;
     bool grounded = false;
+    bool laddering = false;
+    bool crouching = false;
     float tilt = 0f;
+    float handRoll = 0f;
     float verticalVelocity = 0f;
     Transform tiltTransform;
     Transform handTransform;
+    Transform handTargetTransform;
     Rigidbody rb;
     Animator handAnim;
     IActionable handActionable;
+
+    CapsuleCollider capsule;
 
     public Transform GetHand() {
         return handTransform;
@@ -39,8 +50,11 @@ public class PlayerController : MonoBehaviour {
         tiltTransform = transform.GetChild(0);
         handTransform = tiltTransform.GetChild(1);
         rb = gameObject.GetComponent<Rigidbody>();
-        handAnim = tiltTransform.GetChild(0).GetComponent<Animator>();
+        handTargetTransform = tiltTransform.GetChild(0);
+        handAnim = handTargetTransform.GetComponent<Animator>();
+        handTargetTransform = handTargetTransform.GetChild(0);
         handActionable = handTransform.GetComponent<IActionable>();
+        capsule = transform.GetComponent<CapsuleCollider>();
     }
 
     void Update() {
@@ -53,8 +67,15 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
             Cursor.lockState = CursorLockMode.None;
 
-        Vector2 lookStep;
-        lookStep.x = Input.GetAxis("Mouse X");
+
+        Vector2 lookStep = Vector2.zero;
+        if (Input.GetButton("RotateHand")) {
+            handRoll += Input.GetAxis("Mouse X") * mouseSensitivity * 0.5f * Time.fixedDeltaTime;
+        } else {
+            lookStep.x = Input.GetAxis("Mouse X");
+            handRoll = Mathf.Lerp(handRoll, 0, 0.5f);
+        }
+
         lookStep.y = Input.GetAxis("Mouse Y");
         lookStep *= mouseSensitivity * Time.fixedDeltaTime;
 
@@ -63,6 +84,8 @@ public class PlayerController : MonoBehaviour {
         tiltTransform.localRotation = Quaternion.Euler(tilt, 0f, 0f);
 
         transform.Rotate(Vector3.up * lookStep.x);
+
+        handTargetTransform.localRotation = Quaternion.Euler(0, handRoll, 0);
 
         handAnim.SetBool("raised", Input.GetButton("Fire2"));
 
@@ -78,17 +101,30 @@ public class PlayerController : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        RaycastHit hit;
-        Vector3 start = transform.position + Vector3.up * 0.1f;
-        Vector3 dir = Vector3.down;
+        laddering = false;
 
-        prevGrounded = grounded;
-        if (verticalVelocity <= 0 && Physics.Raycast(start, dir, out hit, 0.2f, ~LayerMask.GetMask("Player"))) {
-            grounded = true;
-            rb.MovePosition(hit.point);
+        RaycastHit hit;
+        
+        Vector3 start = transform.position + Vector3.up * 2f * Time.fixedDeltaTime;
+        Vector3 dir = transform.forward;
+        if (Physics.Raycast(start, dir, out hit, 0.3f, LayerMask.GetMask("Ladder"))) {
+            laddering = true;
+            grounded = true;            
             verticalVelocity = 0;
+            if (Input.GetAxis("Vertical") > 0)
+                rb.MovePosition(hit.point - transform.forward * capsule.radius);
         } else {
-            grounded = false;
+            start = transform.position + Vector3.up * 0.1f;
+            dir = Vector3.down;
+
+            prevGrounded = grounded;
+            if (verticalVelocity <= 0 && Physics.Raycast(start, dir, out hit, 0.2f, ~LayerMask.GetMask("Player"))) {
+                grounded = true;
+                rb.MovePosition(hit.point);
+                verticalVelocity = 0;
+            } else {
+                grounded = false;
+            }
         }
 
         Vector3 step;
@@ -100,8 +136,10 @@ public class PlayerController : MonoBehaviour {
         else
             step = Vector3.ClampMagnitude(step, 1);
 
-        verticalVelocity += gravity * Time.fixedDeltaTime;
-        verticalVelocity = Mathf.Clamp(verticalVelocity, -terminalSpeed, terminalSpeed);
+        if (!laddering) {
+            verticalVelocity += gravity * Time.fixedDeltaTime;
+            verticalVelocity = Mathf.Clamp(verticalVelocity, -terminalSpeed, terminalSpeed);
+        }
 
         rb.velocity = (Vector3.up * verticalVelocity) + (speed * step);
 
@@ -132,6 +170,23 @@ public class PlayerController : MonoBehaviour {
             }
             lastFootLeft = !lastFootLeft;
             footSFXTimer -= footSFXMinPeriod;
+
+            Vector2 pos = new Vector2(transform.position.x, transform.position.z);
+            //snowPlanter.Plant(pos);
         }
+
+        float height = standHeight;
+
+        crouching = Input.GetButton("Crouch");        
+        if (Physics.Raycast(tiltTransform.position, Vector3.up, out hit, standHeight - crouchHeight + 0.3f, ~LayerMask.GetMask("Player"))) {
+            crouching = true;
+        }
+
+        if (crouching)
+            height = crouchHeight;
+        
+        capsule.height = height;
+        capsule.center = Vector3.up * height * 0.5f;
+        tiltTransform.localPosition = Vector3.up * Mathf.Lerp(tiltTransform.localPosition.y, height - 0.25f, 0.25f);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -9,9 +10,13 @@ public class InstantCamera : MonoBehaviour, IActionable {
     public GameObject badPhotoPrefab;
     public GameObject origPhotoPrefab;
 
+    public Inventory inventory;
+
     public PhotoGhost[] photoGhosts;
 
-    List<GameObject> originals;
+    GameObject[] originals;
+    PhotoGhost validPG;
+    int validPGIdx;
 
     Vector3 camOrigPosition;
     Quaternion camOrigRotation;
@@ -45,7 +50,7 @@ public class InstantCamera : MonoBehaviour, IActionable {
         camOrigPosition = cam.transform.position;
         camOrigRotation = cam.transform.rotation;
 
-        originals = new List<GameObject>();
+        originals = new GameObject[photoGhosts.Length];
 
         startTimestamp = Time.time;
     }
@@ -64,14 +69,39 @@ public class InstantCamera : MonoBehaviour, IActionable {
 
             isSnappingGhost = true;
 
-            Debug.Log(photoGhostIdx);
-
             ++photoGhostIdx;
         }
     }
 
     public void PrimaryActionStart() {
         if (isAiming && onTrack == null) {
+            isBadPhoto = true;
+
+            for (int i = 0; i < photoGhosts.Length; ++i) {
+                PhotoGhost ghost = photoGhosts[i];
+                if (ghost.IsIntersectingInstantCam()) {
+                    Vector3 rotDiff = ghost.transform.rotation.eulerAngles - transform.rotation.eulerAngles + Vector3.right * 270;
+                    float rotDiffMag = Mathf.Abs(rotDiff.x) + Mathf.Abs(rotDiff.y) + Mathf.Abs(rotDiff.z);
+                    rotDiffMag = Mathf.Repeat(rotDiffMag, 360);
+
+                    if (rotDiffMag < 10) {
+
+                        Transform centerHit = null;
+                        RaycastHit hit;
+                        if (Physics.Raycast(transform.position, -transform.up, out hit, 1000f, ~LayerMask.GetMask("Player"))) {
+                            centerHit = hit.transform;
+                        }
+
+                        if (centerHit == ghost.GetCenterHit()) {
+                            isBadPhoto = false;
+                            validPG = ghost;
+                            validPGIdx = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
             shutterAnim.SetTrigger("snap");
             shutterSFX.Play();
             isSnapping = true;
@@ -105,28 +135,32 @@ public class InstantCamera : MonoBehaviour, IActionable {
                 GameObject origPhotoGO = Instantiate(origPhotoPrefab);
                 OriginalPhoto origPhoto = origPhotoGO.GetComponent<OriginalPhoto>();
 
-                Debug.Log(origPhoto);
-
                 origPhoto.SetPhoto(photo);
 
                 origPhotoGO.layer = LayerMask.NameToLayer("Player");
                 origPhotoGO.transform.GetChild(0).gameObject.layer = LayerMask.NameToLayer("Player");
                 origPhotoGO.transform.GetChild(1).gameObject.layer = LayerMask.NameToLayer("Player");
 
-                originals.Add(origPhotoGO);
+                originals[photoGhostIdx-1] = origPhotoGO;
 
                 cam.transform.position = camOrigPosition;
                 cam.transform.rotation = camOrigRotation;
 
                 origPhotoGO.transform.localScale = Vector3.zero;
                 origPhotoGO.transform.parent = transform.parent;
+
+                //var bytes = photo.EncodeToPNG();
+                //File.WriteAllBytes(Application.dataPath + "/Photos/" + photoGhostIdx + ".png", bytes);
+
             } else {
                 GameObject instantPhotoGO;
                 if (isBadPhoto) {
                     instantPhotoGO = Instantiate(badPhotoPrefab);
                     instantPhotoGO.GetComponent<Rigidbody>().isKinematic = true;
-                } else
+                } else {
                     instantPhotoGO = Instantiate(instantPhotoPrefab);
+                    photo = validPG.illustration;
+                }
 
                 InstantPhoto instantPhoto = instantPhotoGO.GetComponent<InstantPhoto>();
                 instantPhoto.SetPhoto(photo);
@@ -151,7 +185,6 @@ public class InstantCamera : MonoBehaviour, IActionable {
             onTrack.GetComponent<Rigidbody>().isKinematic = false;
             onTrack.Rotate(Vector3.up, 180);
         } else {
-            onTrack.parent = transform.parent;
             onTrack.gameObject.layer = LayerMask.NameToLayer("Player");
             onTrack.GetChild(0).gameObject.layer = LayerMask.NameToLayer("Player");
             onTrack.GetChild(1).gameObject.layer = LayerMask.NameToLayer("Player");
@@ -159,6 +192,9 @@ public class InstantCamera : MonoBehaviour, IActionable {
             onTrack.localPosition = Vector3.zero;
             onTrack.localRotation = Quaternion.identity;
             onTrack.localScale = Vector3.zero;
+
+            inventory.RemoveItem(originals[validPGIdx].transform);
+            inventory.AddItem(onTrack);
         }
 
         onTrack = null;
