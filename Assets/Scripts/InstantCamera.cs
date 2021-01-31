@@ -104,7 +104,7 @@ public class InstantCamera : MonoBehaviour, IActionable {
                     if (rotDiffMag > 180f)
                         rotDiffMag = Mathf.Abs(rotDiffMag - 360);
 
-                    if (rotDiffMag < 10) {
+                    if (rotDiffMag < 20) {
 
                         Transform centerHit = null;
                         RaycastHit hit;
