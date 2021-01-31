@@ -117,7 +117,8 @@ public class Inventory : MonoBehaviour, IActionable {
     }
 
     public void Switch() {
-        prevActive.localScale = Vector3.zero;
+        if (prevActive)
+            prevActive.localScale = Vector3.zero;
         active.localScale = Vector3.one;
     }
 
