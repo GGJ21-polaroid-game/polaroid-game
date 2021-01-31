@@ -125,4 +125,14 @@ public class Inventory : MonoBehaviour, IActionable {
     public void FinishSwitch() {
         isSwitching = false;
     }
+
+    public void SwitchToCamera() {
+        activeIndex = 0;
+        prevActive = active;
+        active = transform.GetChild(activeIndex);
+        activeActionable = active.GetComponent<IActionable>();
+        handAnim.SetTrigger("switch");
+
+        isSwitching = true;
+    }
 }

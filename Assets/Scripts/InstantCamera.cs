@@ -13,6 +13,11 @@ public class InstantCamera : MonoBehaviour, IActionable {
     public Inventory inventory;
 
     public PhotoGhost[] photoGhosts;
+    public PhotoGhost finalPG;
+
+    public float finalPGTime = 5f;
+    float finalPGTimestamp = 0;
+    int takenC = 0;
 
     GameObject[] originals;
     PhotoGhost validPG;
@@ -71,10 +76,24 @@ public class InstantCamera : MonoBehaviour, IActionable {
 
             ++photoGhostIdx;
         }
+
+        if (finalPGTimestamp > 0.1 && Time.time - finalPGTimestamp > finalPGTime) {
+            isBadPhoto = false;
+
+            validPG = finalPG;
+
+            shutterAnim.SetTrigger("snap");
+            shutterSFX.Play();
+            isSnapping = true;
+
+            finalPGTimestamp = 0;
+
+            inventory.SwitchToCamera();
+        }
     }
 
     public void PrimaryActionStart() {
-        if (isAiming && onTrack == null) {
+        if (isAiming && onTrack == null && finalPGTimestamp < 0.1) {
             isBadPhoto = true;
 
             for (int i = 0; i < photoGhosts.Length; ++i) {
@@ -82,7 +101,8 @@ public class InstantCamera : MonoBehaviour, IActionable {
                 if (ghost.IsIntersectingInstantCam()) {
                     Vector3 rotDiff = ghost.transform.rotation.eulerAngles - transform.rotation.eulerAngles + Vector3.right * 270;
                     float rotDiffMag = Mathf.Abs(rotDiff.x) + Mathf.Abs(rotDiff.y) + Mathf.Abs(rotDiff.z);
-                    rotDiffMag = Mathf.Repeat(rotDiffMag, 360);
+                    if (rotDiffMag > 180f)
+                        rotDiffMag = Mathf.Abs(rotDiffMag - 360);
 
                     if (rotDiffMag < 10) {
 
@@ -92,10 +112,16 @@ public class InstantCamera : MonoBehaviour, IActionable {
                             centerHit = hit.transform;
                         }
 
-                        if (centerHit == ghost.GetCenterHit()) {
+                        if (true || centerHit == ghost.GetCenterHit()) {
                             isBadPhoto = false;
                             validPG = ghost;
                             validPGIdx = i;
+
+                            takenC++;
+                            if (takenC == photoGhosts.Length) {
+                                finalPGTimestamp = Time.time;
+                            }
+
                             break;
                         }
                     }
@@ -193,7 +219,8 @@ public class InstantCamera : MonoBehaviour, IActionable {
             onTrack.localRotation = Quaternion.identity;
             onTrack.localScale = Vector3.zero;
 
-            inventory.RemoveItem(originals[validPGIdx].transform);
+            if (validPG != finalPG)
+                inventory.RemoveItem(originals[validPGIdx].transform);
             inventory.AddItem(onTrack);
         }
 
