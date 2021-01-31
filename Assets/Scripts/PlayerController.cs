@@ -176,14 +176,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         float height = standHeight;
-
-        crouching = Input.GetButton("Crouch");        
-        if (Physics.Raycast(tiltTransform.position, Vector3.up, out hit, standHeight - crouchHeight + 0.3f, ~LayerMask.GetMask("Player"))) {
-            crouching = true;
-        }
-
-        if (crouching)
-            height = crouchHeight;
         
         capsule.height = height;
         capsule.center = Vector3.up * height * 0.5f;
