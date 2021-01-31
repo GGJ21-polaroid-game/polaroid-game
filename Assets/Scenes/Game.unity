@@ -20597,7 +20597,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5688906693253480964, guid: c16b0bb837562ea4e841d26df1b500ae, type: 3}
       propertyPath: speed
-      value: 5
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5688906693253480964, guid: c16b0bb837562ea4e841d26df1b500ae, type: 3}
+      propertyPath: footSFXMinPeriod
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 5688906693253480965, guid: c16b0bb837562ea4e841d26df1b500ae, type: 3}
       propertyPath: m_RootOrder
