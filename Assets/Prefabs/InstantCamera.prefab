@@ -219,6 +219,8 @@ MonoBehaviour:
   origPhotoPrefab: {fileID: 7347214189005762058, guid: 20f7afee915bc8c4d946774e5c23b039, type: 3}
   inventory: {fileID: 0}
   photoGhosts: []
+  finalPG: {fileID: 1771636505939395691, guid: 7202730230277f3429dd0a80cb2a48fe, type: 3}
+  finalPGTime: 5
 --- !u!95 &8252987543203551581
 Animator:
   serializedVersion: 3

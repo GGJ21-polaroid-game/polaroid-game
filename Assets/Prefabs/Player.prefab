@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6027577349731564600}
   - component: {fileID: 329373713183963269}
   m_Layer: 8
-  m_Name: Text
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -355,6 +355,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8627ae63074c7804098206a2b3949429, type: 3}
   - {fileID: 8300000, guid: e91ed9293b59f854aaed7f692867b8ec, type: 3}
   - {fileID: 8300000, guid: 7d12563fcb886e8439a7251075696848, type: 3}
+  snowPlanter: {fileID: 0}
 --- !u!82 &8722872607888180676
 AudioSource:
   m_ObjectHideFlags: 0
@@ -782,7 +783,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 5688906693253480965}
-  titleDistance: 10
+  startDistances:
+  - 0
+  - 10
+  - 20
+  fadeDistances:
+  - 10
+  - 20
+  - 30
+  fullADistances:
+  - 0
+  - 13
+  - 23
+  fullBDistances:
+  - 5
+  - 17
+  - 27
+  texts:
+  - Polaroid
+  - '"Where am I?"'
+  - '"I must be missing something ..."'
 --- !u!1 &8932104875883150321
 GameObject:
   m_ObjectHideFlags: 0
