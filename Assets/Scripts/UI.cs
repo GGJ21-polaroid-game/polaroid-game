@@ -27,17 +27,22 @@ public class UI : MonoBehaviour {
         distance += (player.position - playerPrevPosition).magnitude;
         playerPrevPosition = player.position;
 
+        tmp.color = Color.clear;
+
         for (int i = 0; i < startDistances.Length; ++i) {
-            if (distance > startDistances[i] && distance < fadeDistances[i]) {
+            if (distance > startDistances[i] && distance <= fadeDistances[i]) {
                 tmp.text = texts[i];
 
                 if (distance < fullADistances[i])
                     tmp.color = Color.black * Mathf.Lerp(0, 1, (distance - startDistances[i]) / (fullADistances[i] - startDistances[i]));
                 else if (distance > fullBDistances[i])
                     tmp.color = Color.black * Mathf.Lerp(1, 0, (distance - fullBDistances[i]) / (fadeDistances[i] - fullBDistances[i]));
+                else
+                    tmp.color = Color.black;
 
                 break;
             }
+
         }
     }
 }

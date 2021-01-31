@@ -787,22 +787,42 @@ MonoBehaviour:
   - 0
   - 10
   - 20
+  - 30
+  - 40
+  - 50
+  - 60
   fadeDistances:
   - 10
   - 20
   - 30
+  - 40
+  - 50
+  - 60
+  - 70
   fullADistances:
   - 0
   - 13
   - 23
+  - 33
+  - 43
+  - 53
+  - 63
   fullBDistances:
   - 5
   - 17
   - 27
+  - 37
+  - 47
+  - 57
+  - 67
   texts:
   - Polaroid
   - '"Where am I?"'
   - '"I must be missing something ..."'
+  - Naia - Concept Artist
+  - Slojanko - 3D Artist
+  - Woofbike - Programmer
+  - Maja Salamon (AQUAGON) - Music Composer
 --- !u!1 &8932104875883150321
 GameObject:
   m_ObjectHideFlags: 0
